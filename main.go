@@ -54,7 +54,7 @@ func main() {
 	flag.Parse()
 
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 500000)
+	ctx, cancel := context.WithTimeout(ctx, 5000000000000)
 	d, _ := newClient(ctx, dbString)
 	defer cancel()
 
