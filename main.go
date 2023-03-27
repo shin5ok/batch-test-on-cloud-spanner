@@ -143,6 +143,7 @@ func txnOnce(ctx context.Context, d dbClient) {
 			if n%10000 == 0 {
 				log.Println(n, id, count)
 			}
+			time.Sleep(time.Second * 1)
 			n++
 		}
 		return nil
