@@ -84,9 +84,10 @@ func txnForEach(ctx context.Context, d dbClient) {
 	}
 
 	var n = 1
+	var maxMutationCount = 100000000
 	sql := `insert into test (id, name, time) values (@id, @name, @time)`
 N:
-	for {
+	for n < maxMutationCount {
 		_, err := d.sc.ReadWriteTransaction(ctx, func(ctx context.Context, txn *spanner.ReadWriteTransaction) error {
 			t := time.Now().In(jst)
 			id, _ := uuid.NewRandom()
