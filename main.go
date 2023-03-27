@@ -53,8 +53,10 @@ func main() {
 	txnMode := flag.String("txn-mode", "each", "each(default) or once")
 	flag.Parse()
 
-	ctx := context.TODO()
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 500000)
 	d, _ := newClient(ctx, dbString)
+	defer cancel()
 
 	if *deleteMode {
 		deleteAll(ctx, d, "test")
