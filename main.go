@@ -50,7 +50,6 @@ func deleteAll(ctx context.Context, d dbClient, tableName string) error {
 
 func main() {
 	deleteMode := flag.Bool("delete-all", false, "")
-	txnMode := flag.String("txn-mode", "each", "each(default) or once")
 	flag.Parse()
 
 	ctx := context.TODO()
@@ -66,11 +65,7 @@ func main() {
 		fmt.Println("End", time.Now())
 	}()
 
-	if *txnMode == "once" {
-		txnOnce(ctx, d)
-	} else {
-		txnForEach(ctx, d)
-	}
+	txnForEach(ctx, d)
 
 }
 
@@ -111,45 +106,6 @@ N:
 			continue N
 		}
 		n++
-	}
-
-}
-
-func txnOnce(ctx context.Context, d dbClient) {
-	jst, err := time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		panic(err)
-	}
-
-	var n = 1
-	var maxMutationCount = 40000
-	_, err = d.sc.ReadWriteTransaction(ctx, func(ctx context.Context, txn *spanner.ReadWriteTransaction) error {
-		sql := `insert into test (id, name, time) values (@id, @name, @time)`
-		for n < maxMutationCount {
-			t := time.Now().In(jst)
-			id, _ := uuid.NewRandom()
-
-			prepared := spanner.Statement{
-				SQL: sql,
-				Params: map[string]any{
-					"name": id.String(),
-					"id":   id.String(),
-					"time": t.Format(time.RFC3339),
-				},
-			}
-			count, err := txn.Update(ctx, prepared)
-			if err != nil {
-				log.Println(err)
-			}
-			if n%10000 == 0 {
-				log.Println(n, id, count)
-			}
-			n++
-		}
-		return nil
-	})
-	if err != nil {
-		log.Println(err)
 	}
 
 }
