@@ -18,6 +18,7 @@ type dbClient struct {
 }
 
 var dbString = os.Getenv("SPANNER_STRING")
+var silent = os.Getenv("IS_SILENT")
 
 func init() {
 	fmt.Println("Start", time.Now())
@@ -103,7 +104,7 @@ N:
 				log.Println(err)
 				return err
 			}
-			if n%10000 == 0 {
+			if silent == "" && n%10000 == 0 {
 				log.Println(n, id, count)
 			}
 			return nil
@@ -143,7 +144,7 @@ func txnOnce(ctx context.Context, d dbClient) {
 			if err != nil {
 				log.Println(err)
 			}
-			if n%10000 == 0 {
+			if silent == "" && n%10000 == 0 {
 				log.Println(n, id, count)
 			}
 			time.Sleep(time.Second * 1)
